@@ -1,0 +1,97 @@
+# ArXiv Trends Analysis Configuration
+
+# Data Acquisition
+data:
+  dataset_name: "Cornell-University/arxiv"  # Kaggle dataset identifier (not used - sample only)
+  data_dir: "data"  # Directory to store downloaded data
+  sample_size: 5000  # Number of papers to sample (REDUCED for space constraints)
+  recent_years: 5  # Only include papers from last N years
+  min_abstract_length: 50  # Minimum abstract length in characters (REDUCED)
+  random_seed: 42  # For reproducible sampling
+
+# Text Preprocessing
+preprocessing:
+  max_features: 3000  # TF-IDF maximum features (REDUCED for space)
+  ngram_range: [1, 2]  # Unigrams and bigrams
+  min_df: 2  # Minimum document frequency (REDUCED)
+  max_df: 0.8  # Maximum document frequency (ignore too common terms)
+  use_lemmatization: true  # Apply lemmatization
+  custom_stopwords:
+    - "paper"
+    - "study"
+    - "method"
+    - "result"
+    - "approach"
+    - "model"
+    - "propose"
+    - "present"
+    - "show"
+    - "dataset"
+
+# Dimensionality Reduction
+dimensionality_reduction:
+  pca:
+    n_components: 30  # Reduce to 30 dimensions (REDUCED for space)
+    random_state: 42
+  umap:
+    n_components: 2  # Final 2D visualization
+    n_neighbors: 10  # REDUCED from 15
+    min_dist: 0.1
+    metric: "cosine"
+    random_state: 42
+
+# Clustering
+clustering:
+  kmeans:
+    n_clusters: 5  # Fixed to 5 clusters (REDUCED for space)
+    cluster_range: [4, 8]  # Range to test for optimal k (REDUCED)
+    max_iter: 200  # REDUCED from 300
+    n_init: 5  # REDUCED from 10
+    random_state: 42
+  dbscan:
+    eps: 0.5
+    min_samples: 5
+    metric: "cosine"
+  optimal_k_method: "silhouette"  # Options: elbow, silhouette, davies_bouldin, calinski_harabasz
+
+# Keyword Extraction
+keywords:
+  top_n: 20  # Number of top keywords per cluster
+  min_term_freq: 3  # Minimum term frequency in cluster
+
+# Visualization
+visualization:
+  figure_size: [10, 8]  # REDUCED from [12, 8]
+  dpi: 100  # REDUCED from 300 to save space
+  style: "seaborn-v0_8-darkgrid"
+  color_palette: "husl"
+  save_format: "png"
+  wordcloud:
+    max_words: 50  # REDUCED from 100
+    width: 600  # REDUCED from 800
+    height: 300  # REDUCED from 400
+    background_color: "white"
+
+# Output
+output:
+  output_dir: "output"
+  plots_dir: "output/plots"
+  data_dir: "output/data"
+  reports_dir: "output/reports"
+  save_cluster_assignments: true
+  save_keywords: true
+  save_metrics: true
+  export_latex_data: true  # Export data for LaTeX report
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_file: "output/pipeline.log"
+  console_output: true
+
+# Pipeline Execution
+pipeline:
+  skip_if_exists: false  # Skip steps if output already exists
+  save_intermediate: false  # CHANGED to false to save space
+  verbose: true

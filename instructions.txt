@@ -1,0 +1,118 @@
+1.3 Task 3: Categorizing Trends in Science
+You are working as a data scientist at a company which has defined the strategic objective to position itself more
+towards research and academic cooperation. During an early stage of this effort, the company wants to
+investigate what the current topics in science are and for which topics an advanced academic corporation could
+make sense. For this purpose, you are engaged with no simpler task than to provide a comprehensive quantitative
+overview on current topics in science. You have access to a large archive on scientific papers which listing a
+plethora of recently published scientific articles, which is hard to overlook due to its sheer volume. The goal of
+this use case is to provide insights into current trends in science based on preferably homogeneous clusters and
+to provide views which are reduced in dimensionality, but still capture the main traits of the provided dataset. As
+the data contains, in parts, text which must be analysed, the containing information will need pre-processing
+accordingly.
+Note: There is not one perfect solution. It is important to keep the concepts and techniques you have learned
+during the course in mind and to carefully prepare and process the data accordingly. At the end of each step of
+this use case, you should critically assess whether all necessary operations have been conducted and argue
+towards the decisions you have made during this process.
+Tips: Start by exploring the available data. Some descriptive statistics and explorative visualization usually make
+sense at this point. After you have understood the available data, design a plan for your approach to this use case.
+This plan has not to be perfect as it will change when you iteratively proceed. You will probably have to spend
+quite some time with pre-processing the data to build towards a data structure which can be processed by the
+respective machine learning libraries. You might also find that feature engineering can improve your data to
+better capture key information in a way that it is usable by machine learning algorithms. When it comes to the
+actual implementation, keep it simple in the first iteration and try to come up with quick solutions. Building from
+this, you can elaborate and take some steps back to improve the quality of your work.
+Data: For this use case, imagine that you have been given access to an archive of recently published scientific
+works. You can choose to find a suitable, freely available dataset on your own or you can use the data which is
+available from the following webpage: https://www.kaggle.com/Cornell-University/arxiv
+Alternatively, the data can also be downloaded using the following
+my.sharepoint.com/:f:/g/personal/c_mueller-kett_iubh-
+fernstudium_de/ErBgsM5LevNCmSyuTXlZv28B6g49YQyZ6j_I8gmqdLyt5w?e=c9OjgJ
+
+
+
+
+
+
+
+7.1 The IU Case Study
+Case studies have a prominent place in academics. What is the value of a case study for
+students? The value lies, in particular, in the fact that a concrete practical case serves as a
+basis for systematically applying the theories conveyed in the course, i.e., to analyze the
+case with that information and, if possible, to find a solution. Case studies are often complex and do not provide all the details the solution would require. This simulates situations in professional practice which, especially in the case of major challenges, only limited contextual information is available. Managers must be able to deal with missing
+information—therein lies the value in case studies.
+The analysis and processing of case studies plays an important role in modern studies
+because they promote important competences in solution-oriented thinking and decisionmaking. Case studies also train the practical transfer of theoretical knowledge and models
+learned in (self-)study. Case studies are a teaching method in which students work on a
+specific “case” that represents a practical problem situation.
+Case studies occur in a wide variety of professional contexts and are used for various purposes in professional practice, studies, teaching, and research. Classical case studies are
+often reflections on actual decisions from the past based on real data. However, fictitious
+company and organizational cases are equally suitable for this purpose.
+92
+Case studies do not contain a structured preparation of knowledge as textbooks do. The
+task of case studies can be seen more like real life: complex, incomplete, unstructured,
+imprecise, and ambiguous.
+General Learning Objectives
+Case studies seek to gain useful insights through the analytical consideration of example
+questions from the respective professional practice. Ideally, these findings can be abstracted and transferred to other cases and situations. In this way, case studies support the
+development of analytical skills and sharpen the ability to separate the important from
+the unimportant and to open up new alternatives for action.
+Structure and General Instructions
+A case study should follow the classic pattern:
+1. Introduction (case context and explanation)
+2. Body (case presentation, processing, and solution)
+3. Conclusion (discussion and further transfers)
+Of course, this does not mean that these headings—Introduction, Body, and Conclusion—
+should be the only ones chosen for the three sections; other heading titles are acceptable
+as well. However, it is important that the case study has a logical structure that is clearly
+comprehensible to the reader. Further suggestions on how to structure the case study are
+not possible here due to the variety of possible case studies to use in one’s coursework.
+Case studies have special features that can also lead to challenges while working on them.
+Such challenges are desired because case studies exist to prepare students for situations
+that can occur in everyday professional life. This also includes the fact that case studies
+often do not contain all the information one would wish to have, another parallel to everyday life.
+In principle, case study tasks always lack details, so it is a part of the task to find out what
+the concrete case study is about. This implies that there is neither a right question nor a
+right answer. Instead, it is about the process of finding a solution, considering various
+questions and different competing approaches. There are no right or wrong solutions in
+case studies. What is more important is how the proposed solution is justified.
+The purpose of analysis is not to reproduce learned knowledge, e.g., to explain a method
+or concept in detail, but rather to apply knowledge and experience to a decision-making
+situation, i.e., transfer. When working on the case study, it is important to adhere to academic standards. This includes the use of subject-specific literature beyond the coursebook, the ability to cite correctly, and the preparation of a bibliography.
+Formal Guidelines and Submission Requirements
+In addition to the information provided above, the case study has other formal components that must be integrated into every case study. It consists of the following parts (in
+this order):
+93
+• title page
+• table of contents
+• list of figures and/or tables (if necessary)
+• list of abbreviations (if necessary)
+• text part with introduction, body, conclusion
+• bibliography
+• list of appendices (if necessary)
+• appendices and materials (if necessary)
+Formal Document Requirements
+The following formal requirements apply to the text of the case study.
+Table 10: Formal IU Requirements for Case Studies
+Length 7–10 pages of text
+Paper size DIN-A4
+Margins Top and bottom 2 cm; left 2 cm; right 2 cm
+Font General text: Arial 11 pt.; Headings: 12 pt., justified
+Line spacing 1.5
+Sentences Justified, auto-hyphenation
+Footnotes Arial 10 pt., justified
+Paragraph 6 pt. distance after line break
+Section/subsection levels Maximum three levels (1. Main heading, 1.1 Section, 1.1.1 Subheadings)
+Only individual chapters in the text are numbered consecutively; otherwise, sections of the assignment, such as the list
+of figures or the
+bibliography, are not numbered.
+Do not use the underline function, and use italics sparingly to
+emphasize passages.
+Source: Created on behalf of IU (2020).
+The submission of the project report happens via the Turnitin portal. Instructions on how
+to submit your work can be found in a separate manual on myCampus. There you can also
+find out how the evaluation can be viewed directly on Turnitin after the publication of the
+grade on myCampus. It is not possible to deliver the information by email or by other
+means.
+It is important that the affidavit first be submitted electronically via myCampus. Prior to
+this, it is not possible to submit your case study. Further information on this can be found
+in the “Instructions for Submission in myCampus—Turnitin”.

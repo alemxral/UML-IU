@@ -14,21 +14,30 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 
-# Download required NLTK data
+# Download required NLTK data (with error handling for space issues)
 try:
     nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+except (LookupError, OSError, Exception):
+    try:
+        nltk.download('punkt', quiet=True)
+    except:
+        pass  # Skip if download fails
     
 try:
     nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+except (LookupError, OSError, Exception):
+    try:
+        nltk.download('stopwords', quiet=True)
+    except:
+        pass  # Skip if download fails
     
 try:
     nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet')
+except (LookupError, OSError, Exception):
+    try:
+        nltk.download('wordnet', quiet=True)
+    except:
+        pass  # Skip if download fails
 
 
 class TextPreprocessor:

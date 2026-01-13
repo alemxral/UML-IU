@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
 import logging
 import json
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from data_loader import ArxivDataLoader
 from preprocessing import TextPreprocessor, FeatureExtractor, extract_top_keywords
@@ -152,18 +153,24 @@ class ArxivTrendsPipeline:
         
         # Initialize visualizer
         self.visualizer = Visualizer(
-            output_dir=self.config['output']['plots_dir'],
-            style=self.config['visualization']['style'],
-            figsize=tuple(self.config['visualization']['figure_size']),
-            dpi=self.config['visualization']['dpi']
+            output_dir=self.config['output']['plots_dir']
         )
+        
+        plots_dir = Path(self.config['output']['plots_dir'])
         
         # Generate EDA plots
         if 'categories' in self.df.columns:
-            self.visualizer.plot_category_distribution(self.df, top_n=15)
+            self.visualizer.plot_category_distribution(
+                self.df, 
+                top_n=15,
+                save_path=str(plots_dir / 'category_distribution.png')
+            )
         
         if 'year' in self.df.columns and 'categories' in self.df.columns:
-            self.visualizer.plot_temporal_trends(self.df, top_categories=10)
+            self.visualizer.plot_temporal_trends(
+                self.df,
+                save_path=str(plots_dir / 'temporal_trends.png')
+            )
         
         return stats
     
@@ -174,18 +181,14 @@ class ArxivTrendsPipeline:
         logger.info("=" * 80)
         
         self.text_preprocessor = TextPreprocessor(
-            custom_stopwords=self.config['preprocessing'].get('custom_stopwords', []),
             use_lemmatization=self.config['preprocessing'].get('use_lemmatization', True)
         )
-        
-        # Download NLTK data
-        self.text_preprocessor.download_nltk_data()
         
         # Preprocess abstracts
         logger.info("Cleaning and preprocessing abstracts...")
         df_processed = self.df.copy()
         df_processed['abstract_clean'] = self.text_preprocessor.preprocess_corpus(
-            df_processed['abstract'].tolist()
+            df_processed['abstract']
         )
         
         # Remove empty abstracts after preprocessing
@@ -195,12 +198,11 @@ class ArxivTrendsPipeline:
         return df_processed
     
     def vectorize_text(self) -> np.ndarray:
-        """Convert text to TF-IDF features."""
         logger.info("\n" + "=" * 80)
         logger.info("STEP 4: FEATURE EXTRACTION (TF-IDF)")
         logger.info("=" * 80)
         
-        self.vectorizer = TFIDFVectorizer(
+        self.vectorizer = TfidfVectorizer(
             max_features=self.config['preprocessing']['max_features'],
             ngram_range=tuple(self.config['preprocessing']['ngram_range']),
             min_df=self.config['preprocessing']['min_df'],
@@ -212,7 +214,7 @@ class ArxivTrendsPipeline:
         )
         
         logger.info(f"TF-IDF matrix shape: {tfidf_matrix.shape}")
-        logger.info(f"Number of features: {len(self.vectorizer.get_feature_names())}")
+        logger.info(f"Number of features: {len(self.vectorizer.get_feature_names_out())}")
         
         return tfidf_matrix
     
@@ -226,22 +228,20 @@ class ArxivTrendsPipeline:
         
         # PCA for clustering
         logger.info("Applying PCA...")
-        pca_features = self.dim_reducer.fit_transform_pca(
-            self.tfidf_matrix,
-            n_components=self.config['dimensionality_reduction']['pca']['n_components'],
-            random_state=self.config['dimensionality_reduction']['pca']['random_state']
+        pca_features = self.dim_reducer.reduce_pca(
+            self.tfidf_matrix.toarray(),
+            n_components=self.config['dimensionality_reduction']['pca']['n_components']
         )
         logger.info(f"PCA output shape: {pca_features.shape}")
         
         # UMAP for visualization
         logger.info("Applying UMAP for 2D visualization...")
-        umap_features = self.dim_reducer.fit_transform_umap(
+        umap_features = self.dim_reducer.reduce_umap(
             pca_features,
             n_components=self.config['dimensionality_reduction']['umap']['n_components'],
             n_neighbors=self.config['dimensionality_reduction']['umap']['n_neighbors'],
             min_dist=self.config['dimensionality_reduction']['umap']['min_dist'],
-            metric=self.config['dimensionality_reduction']['umap']['metric'],
-            random_state=self.config['dimensionality_reduction']['umap']['random_state']
+            metric=self.config['dimensionality_reduction']['umap']['metric']
         )
         logger.info(f"UMAP output shape: {umap_features.shape}")
         
@@ -267,13 +267,17 @@ class ArxivTrendsPipeline:
             )
             
             # Plot analysis
-            self.visualizer.plot_elbow_silhouette_analysis(optimal_results)
+            plots_dir = Path(self.config['output']['plots_dir'])
+            self.visualizer.plot_elbow_analysis(
+                optimal_results,
+                save_path=str(plots_dir / 'elbow_silhouette_analysis.png')
+            )
             
             # Select optimal k based on method
             method = self.config['clustering']['optimal_k_method']
             if method == 'silhouette':
-                n_clusters = optimal_results['silhouette_scores'].index(
-                    max(optimal_results['silhouette_scores'])
+                n_clusters = optimal_results['silhouette'].index(
+                    max(optimal_results['silhouette'])
                 ) + cluster_range[0]
             else:
                 n_clusters = 8  # Default
@@ -282,17 +286,18 @@ class ArxivTrendsPipeline:
         
         # Perform K-Means clustering
         logger.info(f"Performing K-Means clustering with k={n_clusters}...")
-        labels, metrics = self.clustering_analyzer.kmeans_clustering(
+        labels, model = self.clustering_analyzer.kmeans_clustering(
             self.reduced_features,
             n_clusters=n_clusters,
-            max_iter=self.config['clustering']['kmeans']['max_iter'],
-            n_init=self.config['clustering']['kmeans']['n_init'],
             random_state=self.config['clustering']['kmeans']['random_state']
         )
         
-        logger.info(f"Silhouette Score: {metrics['silhouette_score']:.3f}")
-        logger.info(f"Davies-Bouldin Index: {metrics['davies_bouldin_index']:.3f}")
-        logger.info(f"Calinski-Harabasz Index: {metrics['calinski_harabasz_index']:.1f}")
+        # Get metrics from the analyzer
+        metrics = self.clustering_analyzer.metrics['kmeans']
+        
+        logger.info(f"Silhouette Score: {metrics['silhouette']:.3f}")
+        logger.info(f"Davies-Bouldin Index: {metrics['davies_bouldin']:.3f}")
+        logger.info(f"Calinski-Harabasz Index: {metrics['calinski_harabasz']:.1f}")
         
         # Add cluster labels to dataframe
         self.df_processed['cluster'] = labels
@@ -305,15 +310,16 @@ class ArxivTrendsPipeline:
         logger.info("STEP 7: KEYWORD EXTRACTION")
         logger.info("=" * 80)
         
-        keywords_dict = extract_cluster_keywords(
+        keywords_dict = extract_top_keywords(
             self.tfidf_matrix,
+            self.vectorizer.get_feature_names_out().tolist(),
             self.cluster_labels,
-            self.vectorizer.get_feature_names(),
             top_n=self.config['keywords']['top_n']
         )
         
         for cluster_id, keywords in keywords_dict.items():
-            logger.info(f"Cluster {cluster_id}: {', '.join(keywords[:10])}")
+            keyword_names = [kw[0] for kw in keywords[:10]]
+            logger.info(f"Cluster {cluster_id}: {', '.join(keyword_names)}")
         
         return keywords_dict
     
@@ -324,8 +330,8 @@ class ArxivTrendsPipeline:
         logger.info("=" * 80)
         
         cluster_stats = self.clustering_analyzer.get_cluster_statistics(
-            self.df_processed,
-            'cluster'
+            self.cluster_labels,
+            self.df_processed
         )
         
         analysis = {
@@ -360,30 +366,46 @@ class ArxivTrendsPipeline:
         logger.info("STEP 9: VISUALIZATION GENERATION")
         logger.info("=" * 80)
         
+        plots_dir = Path(self.config['output']['plots_dir'])
+        
         # Cluster visualization
         self.visualizer.plot_clusters_2d(
             self.reduced_2d,
             self.cluster_labels,
-            title="ArXiv Papers Clustering (UMAP 2D)"
+            method_name="UMAP",
+            save_path=str(plots_dir / 'clusters_2d_umap.png')
         )
         
         # Cluster sizes
-        self.visualizer.plot_cluster_sizes(self.df_processed, 'cluster')
+        self.visualizer.plot_cluster_distribution(
+            self.cluster_labels, 
+            method_name='K-Means',
+            save_path=str(plots_dir / 'cluster_sizes.png')
+        )
         
         # Word clouds
         for cluster_id, keywords in self.keywords.items():
             self.visualizer.plot_wordcloud(
                 keywords,
-                title=f"Cluster {cluster_id} Keywords",
-                filename=f"wordcloud_cluster_{cluster_id}.png"
+                cluster_id,
+                save_path=str(plots_dir / f'wordcloud_cluster_{cluster_id}.png')
             )
         
         # Keyword heatmap
-        self.visualizer.plot_keyword_heatmap(self.keywords, top_n=15)
+        self.visualizer.plot_cluster_keywords_heatmap(
+            self.keywords, 
+            top_n=15,
+            save_path=str(plots_dir / 'keyword_heatmap.png')
+        )
         
         # Category by cluster
         if 'categories' in self.df_processed.columns:
-            self.visualizer.plot_category_by_cluster(self.df_processed, 'cluster', top_n=10)
+            self.visualizer.plot_category_by_cluster(
+                self.df_processed, 
+                self.cluster_labels, 
+                top_categories=10,
+                save_path=str(plots_dir / 'category_by_cluster.png')
+            )
         
         logger.info("All visualizations generated successfully")
     
@@ -407,7 +429,9 @@ class ArxivTrendsPipeline:
         # Export keywords
         if self.config['output']['save_keywords']:
             keywords_path = output_data_dir / 'cluster_keywords.json'
-            save_json(self.keywords, str(keywords_path))
+            # Convert numpy int keys to Python int for JSON serialization
+            keywords_json = {int(k): v for k, v in self.keywords.items()}
+            save_json(keywords_json, str(keywords_path))
             logger.info(f"Keywords saved to {keywords_path}")
         
         # Export metrics
@@ -417,7 +441,7 @@ class ArxivTrendsPipeline:
                 'clustering_metrics': self.clustering_metrics,
                 'cluster_analysis': {
                     'cluster_sizes': cluster_analysis['cluster_sizes'],
-                    'cluster_stats': cluster_analysis['cluster_stats']
+                    'cluster_stats': cluster_analysis['cluster_stats'].to_dict(orient='records') if hasattr(cluster_analysis['cluster_stats'], 'to_dict') else cluster_analysis['cluster_stats']
                 }
             }
             metrics_path = output_data_dir / 'analysis_metrics.json'
@@ -466,11 +490,11 @@ class ArxivTrendsPipeline:
             cluster_pct = (cluster_size / eda_stats['total_papers']) * 100
             
             cluster_info = {
-                'id': cluster_id,
-                'size': cluster_size,
-                'percentage': cluster_pct,
-                'keywords': self.keywords[cluster_id][:20],
-                'top_keywords': ', '.join(self.keywords[cluster_id][:5])
+                'id': int(cluster_id),
+                'size': int(cluster_size),
+                'percentage': float(cluster_pct),
+                'keywords': [kw[0] for kw in self.keywords[cluster_id][:20]],
+                'top_keywords': ', '.join([kw[0] for kw in self.keywords[cluster_id][:5]])
             }
             
             latex_data['clusters'].append(cluster_info)

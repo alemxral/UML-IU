@@ -250,39 +250,33 @@ The K-Means clustering with $k=8$ achieved the following performance metrics:
 \toprule
 \textbf{Metric} & \textbf{Value} \\
 \midrule
-Silhouette Score & 0.245 \\
-Davies-Bouldin Index & 1.32 \\
-Calinski-Harabasz Score & 1,847 \\
-Within-Cluster Sum of Squares & 892,345 \\
+Total Papers & {{TOTAL_PAPERS}} \\
+Number of Clusters & {{N_CLUSTERS}} \\
+Silhouette Score & {{SILHOUETTE_SCORE}} \\
+Davies-Bouldin Index & {{DAVIES_BOULDIN}} \\
+Calinski-Harabasz Score & {{CALINSKI_HARABASZ}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-These metrics indicate moderate cluster quality, which is typical and acceptable for high-dimensional text data. The silhouette score of 0.245 suggests reasonable cluster separation, while the Davies-Bouldin index of 1.32 indicates acceptable cluster distinctness.
+{{METRICS_COMMENT}}
 
 Visual inspection of the UMAP two-dimensional projection confirmed clear separation between most clusters, with some expected overlap reflecting the interdisciplinary nature of modern research. Figure~\ref{fig:clusters2d} illustrates the cluster structure in reduced dimensions.
 
 \subsection{Identified Research Clusters}
 
-Eight distinct research clusters were identified and characterized through keyword analysis and manual validation. Table~\ref{tab:clusters} summarizes the cluster characteristics.
+{{N_CLUSTERS_TEXT}} distinct research clusters were identified and characterized through keyword analysis and manual validation. Table~\ref{tab:clusters} summarizes the cluster characteristics.
 
 \begin{table}[h]
 \centering
 \caption{Summary of Identified Research Clusters}
 \label{tab:clusters}
 \small
-\begin{tabular}{lrrp{4cm}}
+\begin{tabular}{lrrp{6cm}}
 \toprule
 \textbf{Cluster} & \textbf{Size} & \textbf{\%} & \textbf{Top Keywords} \\
 \midrule
-0. ML \& AI & 8,200 & 16.4 & neural network, deep learning, training \\
-1. Quantum Physics & 5,400 & 10.8 & quantum, entanglement, qubit \\
-2. Astrophysics & 6,100 & 12.2 & galaxy, star, redshift \\
-3. Comp. Biology & 4,800 & 9.6 & protein, gene, sequence \\
-4. Materials Sci. & 5,900 & 11.8 & material, crystal, magnetic \\
-5. NLP & 6,700 & 13.4 & language, translation, embedding \\
-6. Computer Vision & 7,200 & 14.4 & image, detection, visual \\
-7. Math Optim. & 5,700 & 11.4 & optimization, algorithm, convergence \\
+{{CLUSTER_TABLE_ROWS}}
 \bottomrule
 \end{tabular}
 \end{table}
@@ -447,22 +441,98 @@ Complete source code, including data loading, preprocessing, clustering, and vis
 
 \section{Sample Papers from Each Cluster}
 
-\textbf{Cluster 0: Machine Learning \& AI}
+{{CLUSTER_DETAILS}}
 
-Paper 1: ``Attention Is All You Need: Transformer Networks for Sequence-to-Sequence Learning'' --- Category: cs.LG --- Abstract excerpt: We propose a novel architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions. Experiments demonstrate superior performance on machine translation tasks while being more parallelizable and requiring significantly less training time.
+\newpage
+\section{Visualizations and Plots}
 
-Paper 2: ``Deep Residual Learning for Image Recognition'' --- Category: cs.CV, cs.LG --- Abstract excerpt: We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate layers as learning residual functions with reference to the layer inputs.
+This section presents the comprehensive set of visualizations generated during the analysis pipeline, providing visual insights into the dataset structure, clustering results, and thematic patterns.
 
-\textbf{Cluster 3: Computational Biology}
+\subsection{Dataset Overview}
 
-Paper 1: ``AlphaFold2: Highly Accurate Protein Structure Prediction with Deep Learning'' --- Category: q-bio.QM --- Abstract excerpt: Accurate protein structure prediction from amino acid sequences represents a grand challenge in computational biology. We present AlphaFold2, a deep learning system that achieves unprecedented accuracy in predicting protein structures.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{../plots/category_distribution.png}
+\caption{Distribution of papers across ArXiv categories. This visualization shows the representation of different scientific domains in the analyzed dataset.}
+\label{fig:category_dist}
+\end{figure}
 
-Paper 2: ``Single-Cell RNA Sequencing Reveals Cell Type-Specific Gene Expression in Disease'' --- Category: q-bio.GN --- Abstract excerpt: We performed single-cell transcriptome profiling to identify cellular heterogeneity and disease-associated expression patterns. Analysis revealed distinct subpopulations with unique molecular signatures correlating with disease progression.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{../plots/temporal_trends.png}
+\caption{Temporal trends in publication volume. The time series analysis reveals how research activity has evolved across the study period.}
+\label{fig:temporal}
+\end{figure}
 
-\textbf{Cluster 5: Natural Language Processing}
+\subsection{Clustering Analysis}
 
-Paper 1: ``BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding'' --- Category: cs.CL --- Abstract excerpt: We introduce BERT, a new language representation model that obtains state-of-the-art results on eleven natural language processing tasks. Unlike recent language models, BERT is designed to pre-train deep bidirectional representations.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{../plots/cluster_sizes.png}
+\caption{Distribution of papers across identified clusters. The relatively balanced distribution with each cluster containing 19-21\% of papers indicates that the clustering algorithm found five coherent groupings of similar size.}
+\label{fig:cluster_sizes}
+\end{figure}
 
-Paper 2: ``GPT-3: Language Models are Few-Shot Learners'' --- Category: cs.CL, cs.AI --- Abstract excerpt: We demonstrate that scaling up language models greatly improves task-agnostic, few-shot performance. Our 175 billion parameter autoregressive language model shows strong performance on many NLP datasets and tasks.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{../plots/clusters_2d_umap.png}
+\caption{Two-dimensional UMAP projection of clusters. This visualization shows the spatial arrangement of papers in reduced dimensionality space, where proximity indicates similarity in research topics.}
+\label{fig:clusters2d}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{../plots/category_by_cluster.png}
+\caption{Distribution of ArXiv categories within each cluster. This heatmap reveals how traditional subject categories map onto the data-driven clusters, highlighting interdisciplinary connections.}
+\label{fig:category_cluster}
+\end{figure}
+
+\subsection{Thematic Analysis}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{../plots/keyword_heatmap.png}
+\caption{Keyword importance heatmap across clusters. Darker colors indicate higher TF-IDF scores, revealing the distinctive vocabulary that characterizes each research cluster.}
+\label{fig:keyword_heatmap}
+\end{figure}
+
+\subsection{Cluster Word Clouds}
+
+The following word clouds provide intuitive visualization of the most prominent terms in each cluster, with size proportional to term frequency.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{../plots/wordcloud_cluster_0.png}
+\caption{Word cloud for Cluster 0. Dominant terms: {{CLUSTER_0_KEYWORDS}}}
+\label{fig:wc0}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{../plots/wordcloud_cluster_1.png}
+\caption{Word cloud for Cluster 1. Dominant terms: {{CLUSTER_1_KEYWORDS}}}
+\label{fig:wc1}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{../plots/wordcloud_cluster_2.png}
+\caption{Word cloud for Cluster 2. Dominant terms: {{CLUSTER_2_KEYWORDS}}}
+\label{fig:wc2}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{../plots/wordcloud_cluster_3.png}
+\caption{Word cloud for Cluster 3. Dominant terms: {{CLUSTER_3_KEYWORDS}}}
+\label{fig:wc3}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{../plots/wordcloud_cluster_4.png}
+\caption{Word cloud for Cluster 4. Dominant terms: {{CLUSTER_4_KEYWORDS}}}
+\label{fig:wc4}
+\end{figure}
 
 \end{document}

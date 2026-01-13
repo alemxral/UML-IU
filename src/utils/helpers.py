@@ -6,6 +6,24 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 import yaml
+import numpy as np
+import pandas as pd
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Custom JSON encoder for numpy and pandas types."""
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, pd.DataFrame):
+            return obj.to_dict(orient='records')
+        elif isinstance(obj, pd.Series):
+            return obj.tolist()
+        return super().default(obj)
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
@@ -34,7 +52,7 @@ def save_json(data: Any, filepath: str, indent: int = 2) -> None:
     """
     Path(filepath).parent.mkdir(parents=True, exist_ok=True)
     with open(filepath, 'w') as f:
-        json.dump(data, f, indent=indent)
+        json.dump(data, f, indent=indent, cls=NumpyEncoder)
 
 
 def load_json(filepath: str) -> Any:

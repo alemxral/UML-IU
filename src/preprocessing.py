@@ -16,10 +16,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 
 # Download required NLTK data (with error handling for space issues)
 try:
-    nltk.data.find('tokenizers/punkt')
+    nltk.data.find('tokenizers/punkt_tab')
 except (LookupError, OSError, Exception):
     try:
-        nltk.download('punkt', quiet=True)
+        nltk.download('punkt_tab', quiet=True)
     except:
         pass  # Skip if download fails
     
@@ -250,12 +250,13 @@ def extract_top_keywords(X: np.ndarray, feature_names: List[str],
         cluster_tfidf = X[cluster_mask]
         
         # Calculate mean TF-IDF score for each term in the cluster
-        mean_tfidf = cluster_tfidf.mean(axis=0)
+        mean_tfidf = np.asarray(cluster_tfidf.mean(axis=0)).flatten()
         
         # Get top terms
         top_indices = mean_tfidf.argsort()[-top_n:][::-1]
         keywords = [
-            (feature_names[idx], mean_tfidf[idx]) 
+            (feature_names[idx.item() if hasattr(idx, 'item') else int(idx)], 
+             mean_tfidf[idx].item() if hasattr(mean_tfidf[idx], 'item') else float(mean_tfidf[idx]))
             for idx in top_indices
         ]
         
